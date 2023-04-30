@@ -1,7 +1,9 @@
 const express=require("express")
 const {errorHandler}=require('./backend/middleware/errorMiddleware')
 const dotenv=require("dotenv").config()
+const connectDB=require('./backend/config/db')
 const port=process.env.PORT || 8000
+connectDB()
 
 const app=express()
 app.use(express.json())
