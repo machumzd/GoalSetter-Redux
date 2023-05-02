@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 import { FaUser } from "react-icons/fa";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { register, reset } from "../features/auth/authSlice";
+import Spinner from "../components/Spinner";
 function Register() {
   const [formData, setFormData] = useState({
     name: "",
@@ -9,19 +14,46 @@ function Register() {
     password2: "",
   });
   const { name, email, phone, password, password2 } = formData;
-  const onChange = (e ) => {
-    setFormData((prevState)=>({
-        ...prevState,
-        [e.target.name]:e.target.value,
-        [e.target.email]:e.target.value,
-        [e.target.phone]:e.target.value,
-        [e.target.password]:e.target.value,
-        [e.target.password2]:e.target.value
-    }))
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user, isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.auth
+  );
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+    }
+    if (isSuccess || user) {
+      navigate("/");
+    }
+    dispatch(reset());
+  }, [user, isError, isSuccess, message, navigate, dispatch]);
+  
+  const onChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
   };
   const onSubmit = (e) => {
     e.preventDefault();
+
+    if (password !== password) {
+      toast.error("passwords do not match");
+    } else {
+      const userData = {
+        name,
+        email,
+        phone,
+        password,
+      };
+      dispatch(register(userData));
+    }
   };
+  if (isLoading) {
+    return <Spinner />;
+  }
   return (
     <>
       <section className="heading">
@@ -37,7 +69,7 @@ function Register() {
             <input
               type="text"
               className="form-control"
-              id="name"
+              name="name"
               value={name}
               placeholder="enter your name"
               onChange={onChange}
@@ -45,7 +77,7 @@ function Register() {
             <input
               type="number"
               className="form-control"
-              id="phone"
+              name="phone"
               value={phone}
               placeholder="enter your phone number"
               onChange={onChange}
@@ -53,7 +85,7 @@ function Register() {
             <input
               type="text"
               className="form-control"
-              id="email"
+              name="email"
               value={email}
               placeholder="enter your email"
               onChange={onChange}
@@ -61,7 +93,7 @@ function Register() {
             <input
               type="password"
               className="form-control"
-              id="password"
+              name="password"
               value={password}
               placeholder="password"
               onChange={onChange}
@@ -69,7 +101,7 @@ function Register() {
             <input
               type="password"
               className="form-control"
-              id="password2"
+              name="password2"
               value={password2}
               placeholder="Confirm password"
               onChange={onChange}
