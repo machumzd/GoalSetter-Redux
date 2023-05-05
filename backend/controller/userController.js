@@ -69,11 +69,7 @@ const loginUser=asyncHandler(async(req,res)=>{
 //@desc get user data
 //@route GET /api/users/me
 const getMe=asyncHandler(async(req,res)=>{
-    const {_id,name,phone,email}=await User.findById(req.user.id)
-    res.status(200).json({
-        id:_id,
-        name,phone,email
-    })
+    res.status(200).json(req.user)
     res.json({message:'User data display'})
 })
 
